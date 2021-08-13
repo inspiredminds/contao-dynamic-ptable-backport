@@ -12,9 +12,12 @@ declare(strict_types=1);
 
 namespace InspiredMinds\ContaoDynamicPtableBackport\EventListener;
 
+use Composer\Semver\Semver;
 use Contao\Controller;
 use Contao\CoreBundle\ServiceAnnotation\Hook;
 use Contao\Input;
+use Jean85\Exception\ReplacedPackageException;
+use Jean85\PrettyVersions;
 
 /**
  * @Hook("loadDataContainer")
@@ -23,6 +26,10 @@ class LoadDataContainerListener
 {
     public function __invoke(string $currentTable): void
     {
+        if (!$this->isNeeded()) {
+            return;
+        }
+
         if (!($GLOBALS['TL_DCA'][$currentTable]['config']['dynamicPtable'] ?? false) || !empty($GLOBALS['TL_DCA'][$currentTable]['config']['ptable']) || !isset($GLOBALS['BE_MOD'])) {
             return;
         }
@@ -47,5 +54,16 @@ class LoadDataContainerListener
                 }
             }
         }
+    }
+
+    private function isNeeded(): bool
+    {
+        try {
+            $version = PrettyVersions::getVersion('contao/core-bundle');
+        } catch (ReplacedPackageException $e) {
+            $version = PrettyVersions::getVersion('contao/contao');
+        }
+
+        return Semver::satisfies($version->getShortVersion(), '4.9.*');
     }
 }
