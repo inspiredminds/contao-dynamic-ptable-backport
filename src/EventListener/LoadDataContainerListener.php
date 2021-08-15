@@ -30,6 +30,11 @@ class LoadDataContainerListener
             return;
         }
 
+        // Fix for https://github.com/contao/contao/pull/3311
+        if (empty($GLOBALS['TL_DCA'][$currentTable]['config']['ptable'])) {
+            unset($GLOBALS['TL_DCA'][$currentTable]['config']['ptable']);
+        }
+
         if (!($GLOBALS['TL_DCA'][$currentTable]['config']['dynamicPtable'] ?? false) || !empty($GLOBALS['TL_DCA'][$currentTable]['config']['ptable']) || !isset($GLOBALS['BE_MOD'])) {
             return;
         }
