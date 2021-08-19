@@ -65,9 +65,15 @@ class LoadDataContainerListener
     {
         try {
             $version = PrettyVersions::getVersion('contao/core-bundle');
+
+            if ('' === $version->getShortVersion()) {
+                $version = PrettyVersions::getVersion('contao/contao');
+            }
         } catch (ReplacedPackageException $e) {
             $version = PrettyVersions::getVersion('contao/contao');
-        }
+        } catch (\OutOfBoundsException $e) {
+			$version = PrettyVersions::getVersion('contao/contao');
+		}
 
         return Semver::satisfies($version->getShortVersion(), '4.9.*');
     }
