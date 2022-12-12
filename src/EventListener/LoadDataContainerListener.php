@@ -52,6 +52,10 @@ class LoadDataContainerListener
                 Controller::loadDataContainer($table);
                 $ctable = $GLOBALS['TL_DCA'][$table]['config']['ctable'] ?? [];
 
+                if (!\is_array($ctable)) {
+                    throw new \RuntimeException(sprintf('The ctable definition of %s is not an array.', $table));
+                }
+
                 if (\in_array($currentTable, $ctable, true)) {
                     $GLOBALS['TL_DCA'][$currentTable]['config']['ptable'] = $table;
 
